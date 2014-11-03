@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>OpenLayers MapQuest Demo</title>
+    <link rel="stylesheet" href="theme/default/style.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="//code.jquery.com/jquery-2.1.1.js"></script>
+
+</head>
+
+<body>
+    <h1 id="title">OpenLayers with MapQuest Tiles</h1>
+    <div><a href="index.html">index</a> - <a href="comparer.html">comparer</a>
+    </div>
+    <div id="map" class="smallmap"></div>
+    <div>latitude
+        <input type='text' id='lat' value='3991749.85285' />longitude
+        <input type='text' id='lon' value='-13129701.0287' />
+        <input type='checkbox' id='shouldConvertFromGeografic' title='Convert from EPSG:4326' />
+        <button id='panOnMap'>pan</button>
+    </div>
+    <div>
+        <label>zoom level</label>
+        <input type='text' id='zoomLevel' />
+    </div>
+    <script src="OpenLayers.js"></script>
+    <script src="comparer.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            map = comparer.initSingleMap({
+                center: [2e5, 5e6],
+                div: 'map'
+            });
+
+            $('#zoomLevel').keypress(function (event) {
+                if (event.which == 13) {
+                    event.preventDefault();
+                    map.zoomTo($('#zoomLevel').val());
+                }
+            });
+
+            $('#zoomLevel').val(map.getZoom());
+
+            var panOnMap = function () {
+                var lat = $('#lat').val(),
+                    lon = $('#lon').val();
+                console.log(lat + ' ' + lon);
+                var lonLat = new OpenLayers.LonLat(lon, lat);
+                if ($('#shouldConvertFromGeografic').is(':checked')) {
+                    lonLat.transform('EPSG:4326', map.getProjection());
+                }
+                map.panTo(lonLat);
+            };
+
+            $('#panOnMap').click(panOnMap);
+
+            map.events.on({
+                'zoomend': function () {
+                    $('#zoomLevel').val(map.getZoom());
+                    console.log(arguments);
+                }
+            });
+
+        });
+    </script>
+</body>
+
+</html>

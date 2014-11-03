@@ -1,0 +1,20 @@
+.smallmap {
+    width: 900px;
+    height: 600px;
+}
+.compareMap {
+    width: 600px;
+    height: 600px;
+}
+.container1 {
+    padding: 10px;
+    float: left;
+}
+.clearBoth {
+/*    float: left;*/
+    clear: both;
+    background-color: blue;
+    height: 2px;
+    width: 100%;
+    margin: 10px;
+}

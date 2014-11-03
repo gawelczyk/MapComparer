@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>OpenLayers MapQuest Demo</title>
+    <link rel="stylesheet" href="theme/default/style.css" type="text/css">
+    <link rel="stylesheet" href="style.css" type="text/css">
+    <script src="//code.jquery.com/jquery-2.1.1.js"></script>
+
+</head>
+
+<body>
+    <h1 id="title">OpenLayers with MapQuest Tiles</h1>
+    <div><a href="index.html">index</a> - <a href="comparer.html">comparer</a>
+    </div>
+    <div class='container1'>
+        <div id="map1" class="compareMap"></div>
+    </div>
+    <div class='container1'>
+        <div id="map2" class="compareMap"></div>
+    </div>
+
+    <div class='clearBoth'></div>
+
+    <div>latitude
+        <input type='text' id='lat' value='3991749.85285' />longitude
+        <input type='text' id='lon' value='-13129701.0287' />
+        <input type='checkbox' id='shouldConvertFromGeografic' title='Convert from EPSG:4326' />
+        <button id='panOnMap'>pan</button>
+    </div>
+    <div>
+        <label>zoom level</label>
+        <input type='text' id='zoomLevel' />
+    </div>
+    <script src="OpenLayers.js"></script>
+    <script src="comparer.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            var map = comparer.initSingleMap({
+                center: [2e5, 5e6],
+                div: 'map1'
+            });
+
+            var map2 = comparer.initSingleMap({
+                div: 'map2'
+            });
+
+            $('#zoomLevel').val(map.getZoom());
+
+            $('#zoomLevel').keypress(function (event) {
+                if (event.which == 13) {
+                    event.preventDefault();
+                    map.zoomTo($('#zoomLevel').val());
+                }
+            }).blur(function () {
+                event.preventDefault();
+                map.zoomTo($('#zoomLevel').val());
+            });
+
+            var panOnMap = function () {
+                var lat = $('#lat').val(),
+                    lon = $('#lon').val();
+                console.log(lat + ' ' + lon);
+                var lonLat = new OpenLayers.LonLat(lon, lat);
+                if ($('#shouldConvertFromGeografic').is(':checked')) {
+                    lonLat.transform('EPSG:4326', map.getProjection());
+                }
+                map.panTo(lonLat);
+            };
+
+            $('#panOnMap').click(panOnMap);
+
+
+            var updateMap = function (sourceMap) {
+                console.log('updateing ', this.div, this._resizing);
+                sourceMap._resizing = true;
+                if (!this._resizing) {
+                    this._resizing = true;
+                    this.zoomToExtent(sourceMap.getExtent(), true);
+                    this.zoomTo(sourceMap.getZoom());
+                    delete this._resizing;
+                }
+                delete sourceMap._resizing;
+            };
+
+            map.events.on({
+                'zoomend': function () {
+                    //console.log('zoomend map1', arguments);
+                    $('#zoomLevel').val(map.getZoom());
+                    updateMap.call(map2, this);
+                },
+                'moveend': function () {
+                    //console.log('zoomend map1', arguments);
+                    updateMap.call(map2, this);
+                }
+            });
+
+            map.events.triggerEvent('moveend', null);
+
+            map2.events.on({
+                'zoomend': function () {
+                    //console.log('zoomend map2');
+                    updateMap.call(map, this);
+                },
+                'moveend': function () {
+                    //console.log('moveend map2');
+                    updateMap.call(map, this);
+                }
+            });
+
+        });
+    </script>
+</body>
