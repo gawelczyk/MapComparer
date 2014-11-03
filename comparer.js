@@ -97,21 +97,6 @@ var comparer = (function () {
             map.zoomTo(options.zomm || 5);
             map.panTo(options.center || [0,0]);
             return map;
-        },
-        initSideBySideView: function () {
-
-            var map = createMap({
-                div: 'map'
-            });
-            addBaseMaps.call(map);
-            addControls.call(map);
-
-
-                        var map2 = createMap({
-                div: 'map'
-            });
-            addBaseMaps.call(map2);
-            addControls.call(map2);
         }
     }
 
